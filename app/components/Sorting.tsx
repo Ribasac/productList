@@ -8,24 +8,27 @@ const Sorting = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const handleSelect = (sort: any) => {
-        selectedSort.includes(sort)
-            ? setSort((p) =>
-                  p.filter((i) => {
-                      i != sort;
-                  })
-              )
-            : setSort((p) => [sort]);
+        const params = new URLSearchParams(searchParams.toString());
+        let tempSort = selectedSort;
+        tempSort.includes(sort) ? (tempSort = []) : (tempSort = [sort]);
+
+        if (tempSort.length > 0) {
+            params.set("sort", tempSort[0]);
+        } else {
+            params.delete("sort");
+        }
+        setSort(tempSort);
+        router.replace(`/products?${params.toString()}`, { scroll: false });
     };
 
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString());
-        if (selectedSort.length > 0) {
-            params.set("sort", selectedSort[0]);
-        } else {
-            params.delete("sort");
+        let sort = params.get("sort");
+        if (sort) {
+            setSort([sort]);
         }
-        router.replace(`/products?${params.toString()}`, { scroll: false });
-    }, [selectedSort]);
+    }, []);
+
     return (
         <div className="px-8 py-8 w-full bg-white sticky top-0 z-1000 flex flex-row justify-end gap-8">
             {sorting.map((sort) => (

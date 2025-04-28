@@ -8,34 +8,46 @@ type BrandFilterProps = {
 };
 
 export default function BrandFilter({ brands }: BrandFilterProps) {
-    const [selectedBrand, setSelectedBrand] = useState<any[]>([]);
+    const [selectedBrand, setBrands] = useState<any[]>([]);
     const searchParams = useSearchParams();
     const router = useRouter();
 
     const handleSelect = (brand: string) => {
-        console.log(brand);
-
-        selectedBrand.includes(brand)
-            ? setSelectedBrand((p) =>
-                  p.filter((i) => {
-                      return i != brand;
-                  })
-              )
-            : setSelectedBrand((p) => [...p, brand]);
-    };
-
-    useEffect(() => {
         const params = new URLSearchParams(searchParams.toString());
-        if (selectedBrand.length > 0) {
+
+        let tempBrands = selectedBrand;
+
+        if (tempBrands.includes(brand)) {
+            tempBrands = tempBrands.filter((i) => {
+                i != brand;
+            });
+        } else {
+            tempBrands = [...tempBrands, brand];
+        }
+
+        if (tempBrands.length > 0) {
             params.delete("brand");
-            selectedBrand.forEach((brand) => {
+            tempBrands.forEach((brand) => {
                 params.append("brand", brand);
             });
         } else {
             params.delete("brand");
         }
+        setBrands(tempBrands);
         router.replace(`/products?${params.toString()}`, { scroll: false });
-    }, [selectedBrand]);
+    };
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        const brandSelected = params.getAll("brand");
+        if (brandSelected) {
+            if (Array.isArray(brandSelected)) {
+                setBrands(brandSelected);
+            } else {
+                setBrands([brandSelected]);
+            }
+        }
+    }, []);
 
     return (
         <div className="flex flex-wrap flex-col gap-2 justify-start h-full sticky top-32 py-24">
