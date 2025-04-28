@@ -19,7 +19,7 @@ export default function BrandFilter({ brands }: BrandFilterProps) {
 
         if (tempBrands.includes(brand)) {
             tempBrands = tempBrands.filter((i) => {
-                i != brand;
+                return i != brand;
             });
         } else {
             tempBrands = [...tempBrands, brand];
